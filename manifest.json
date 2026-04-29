@@ -1,0 +1,18 @@
+{
+  "name": "Desafio Atleta Híbrido",
+  "short_name": "Atleta Híbrido",
+  "description": "Programa de treino híbrido de Eduardo Lima",
+  "start_url": "./treino-hibrido.html",
+  "display": "standalone",
+  "background_color": "#0f1a08",
+  "theme_color": "#0f1a08",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

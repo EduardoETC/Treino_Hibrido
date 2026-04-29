@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f1a08">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Atleta Híbrido">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Desafio Atleta Híbrido</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #b5f23d;
+    --dark: #0f1a08;
+    --card: #161f0c;
+    --card2: #1c2810;
+    --text: #e8f0d8;
+    --muted: #7a9060;
+    --accent: #ff5c2b;
+    --blue: #3de8f2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 80px; }
+
+  /* HEADER */
+  .header { background: linear-gradient(160deg,#162208 0%,#0f1a08 60%); padding: 28px 20px 20px; border-bottom: 2px solid var(--green); }
+  .header-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(181,242,61,.12); border: 1px solid rgba(181,242,61,.3); color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; margin-bottom: 10px; }
+  .header h1 { font-family: 'Bebas Neue',sans-serif; font-size: 36px; line-height: 1; color: #fff; letter-spacing: 1px; }
+  .header h1 span { color: var(--green); }
+  .header-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0d1609; border-top: 1px solid rgba(181,242,61,.15); display: flex; z-index: 200; }
+  .bnav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 4px; cursor: pointer; border: none; background: none; color: var(--muted); font-family: 'DM Sans',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .3px; transition: all .2s; }
+  .bnav-btn .bnav-icon { font-size: 20px; }
+  .bnav-btn.active { color: var(--green); }
+  .bnav-btn.active .bnav-icon { filter: drop-shadow(0 0 6px rgba(181,242,61,.5)); }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* DAY SELECTOR */
+  .day-selector { padding: 16px 20px 14px; background: var(--dark); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(181,242,61,.1); }
+  .day-selector-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .days-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; }
+  .day-btn { background: var(--card); border: 1.5px solid transparent; border-radius: 12px; padding: 8px 4px; text-align: center; cursor: pointer; transition: all .2s; }
+  .day-btn:active { transform: scale(.95); }
+  .day-btn .d-name { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: .5px; text-transform: uppercase; }
+  .day-btn .d-icon { font-size: 18px; margin: 4px 0 3px; display: block; }
+  .day-btn .d-type { font-size: 8px; font-weight: 700; color: var(--muted); }
+  .day-btn.run-day { border-color: rgba(181,242,61,.2); }
+  .day-btn.run-day .d-type { color: var(--green); }
+  .day-btn.gym-day { border-color: rgba(61,232,242,.2); }
+  .day-btn.gym-day .d-type { color: var(--blue); }
+  .day-btn.active.run-day { background: rgba(181,242,61,.15); border-color: var(--green); }
+  .day-btn.active.gym-day { background: rgba(61,232,242,.12); border-color: var(--blue); }
+  .day-btn.active .d-name { color: var(--text); }
+
+  .content { padding: 20px; }
+  .day-content { display: none; }
+  .day-content.active { display: block; }
+
+  /* HERO */
+  .day-hero { border-radius: 16px; padding: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; }
+  .day-hero.run-hero { background: linear-gradient(135deg,rgba(181,242,61,.12),rgba(181,242,61,.04)); border: 1px solid rgba(181,242,61,.2); }
+  .day-hero.gym-hero { background: linear-gradient(135deg,rgba(61,232,242,.1),rgba(61,232,242,.03)); border: 1px solid rgba(61,232,242,.2); }
+  .day-hero.abs-hero { background: linear-gradient(135deg,rgba(255,92,43,.1),rgba(255,92,43,.03)); border: 1px solid rgba(255,92,43,.2); }
+  .hero-icon { font-size: 36px; flex-shrink: 0; }
+  .hero-title { font-family: 'Bebas Neue',sans-serif; font-size: 26px; line-height: 1; color: #fff; letter-spacing: 1px; }
+  .hero-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* BLOCKS */
+  .block { background: var(--card); border-radius: 14px; padding: 16px; margin-bottom: 12px; border-left: 3px solid var(--green); }
+  .block.gym-block { border-left-color: var(--blue); }
+  .block.abs-block { border-left-color: var(--accent); }
+  .block-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .block-title { font-weight: 700; font-size: 15px; color: var(--text); line-height: 1.4; margin-bottom: 10px; }
+  .block-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tag { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 6px; }
+  .tag.green { background: rgba(181,242,61,.15); color: var(--green); }
+  .tag.blue { background: rgba(61,232,242,.12); color: var(--blue); }
+  .tag.orange { background: rgba(255,92,43,.15); color: var(--accent); }
+  .tag.gray { background: rgba(255,255,255,.07); color: var(--muted); }
+
+  .video-btn { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; background: rgba(181,242,61,.1); border: 1.5px solid rgba(181,242,61,.25); color: var(--green); font-size: 12px; font-weight: 700; padding: 9px 14px; border-radius: 10px; margin-right: 8px; margin-bottom: 6px; }
+  .video-btn:active { opacity: .7; }
+  .video-btn.blue-btn { background: rgba(61,232,242,.1); border-color: rgba(61,232,242,.25); color: var(--blue); }
+  .video-btn.orange-btn { background: rgba(255,92,43,.1); border-color: rgba(255,92,43,.25); color: var(--accent); }
+
+  /* RUN */
+  .run-phase { display: flex; align-items: center; gap: 12px; background: var(--card2); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; }
+  .run-phase-icon { font-size: 22px; flex-shrink: 0; }
+  .run-phase-info { flex: 1; }
+  .run-phase-title { font-weight: 700; font-size: 14px; color: var(--text); }
+  .run-phase-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .run-phase-time { font-family: 'Bebas Neue',sans-serif; font-size: 22px; color: var(--muted); flex-shrink: 0; }
+  .round-card { background: var(--card2); border-radius: 14px; overflow: hidden; margin-bottom: 8px; border: 1px solid rgba(181,242,61,.1); }
+  .round-step { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+  .round-step + .round-step { border-top: 1px solid rgba(255,255,255,.04); }
+  .step-action { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .step-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .step-dot.run-dot { background: var(--green); }
+  .step-dot.walk-dot { background: var(--muted); }
+  .step-verb { font-size: 16px; font-weight: 700; }
+  .step-verb.run-verb { color: var(--green); }
+  .step-verb.walk-verb { color: var(--muted); }
+  .step-intensity { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .step-time { font-family: 'Bebas Neue',sans-serif; font-size: 28px; line-height: 1; flex-shrink: 0; }
+  .step-time.run-time { color: var(--green); }
+  .step-time.walk-time { color: var(--muted); }
+  .step-unit { font-size: 11px; color: var(--muted); margin-top: 2px; text-align: right; }
+  .round-dots { display: flex; gap: 5px; flex-wrap: wrap; padding: 8px 16px 12px; }
+  .rdot { width: 38px; height: 38px; border-radius: 10px; background: rgba(181,242,61,.08); border: 2px solid rgba(181,242,61,.2); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue',sans-serif; font-size: 15px; color: var(--green); cursor: pointer; transition: all .15s; user-select: none; -webkit-user-select: none; }
+  .rdot:active { transform: scale(.88); }
+  .rdot.done { background: var(--green); color: var(--dark); border-color: var(--green); }
+  .rdot.done span { display: none; }
+  .rdot.done::after { content: "✓"; font-size: 18px; }
+  .run-summary { background: rgba(181,242,61,.06); border: 1px solid rgba(181,242,61,.15); border-radius: 12px; padding: 14px 16px; margin-top: 14px; display: flex; }
+  .summary-item { flex: 1; text-align: center; }
+  .summary-item + .summary-item { border-left: 1px solid rgba(255,255,255,.06); }
+  .summary-val { font-family: 'Bebas Neue',sans-serif; font-size: 22px; color: var(--green); }
+  .summary-lbl { font-size: 10px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
+  /* HIIT */
+  .hiit-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .hiit-num { width: 28px; height: 28px; border-radius: 8px; background: rgba(255,92,43,.15); color: var(--accent); font-family: 'Bebas Neue',sans-serif; font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .hiit-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); }
+  .hiit-time { font-size: 11px; font-weight: 700; color: var(--accent); background: rgba(255,92,43,.1); padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+  .rest-row { display: flex; align-items: center; gap: 8px; padding: 4px 0 4px 40px; }
+  .rest-bar { flex: 1; height: 1px; background: rgba(255,255,255,.05); }
+  .rest-label { font-size: 10px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+
+  /* ============ RUNNING TIMER ============ */
+  .run-timer { background: rgba(181,242,61,.05); border: 1px solid rgba(181,242,61,.15); border-radius: 16px; padding: 20px 16px 18px; margin: 0 0 14px; text-align: center; }
+  .run-timer-phase { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; transition: color .3s; }
+  .run-timer-phase.ph-sprint { color: var(--green); }
+  .run-timer-phase.ph-rest { color: var(--blue); }
+  .run-timer-display { font-family: 'Bebas Neue',sans-serif; font-size: 84px; line-height: 1; color: var(--text); letter-spacing: 2px; margin-bottom: 6px; transition: color .3s; }
+  .run-timer-display.ph-sprint { color: var(--green); }
+  .run-timer-display.ph-rest { color: var(--blue); }
+  .run-timer-bar { height: 5px; background: rgba(255,255,255,.08); border-radius: 3px; margin: 0 0 12px; overflow: hidden; }
+  .run-timer-fill { height: 100%; border-radius: 3px; background: var(--green); width: 100%; }
+  .run-timer-round { font-size: 12px; color: var(--muted); font-weight: 700; letter-spacing: .3px; margin-bottom: 18px; }
+  .run-timer-btns { display: flex; gap: 10px; justify-content: center; }
+  .tbtn { font-family: 'DM Sans',sans-serif; font-size: 14px; font-weight: 700; padding: 13px 20px; border-radius: 12px; border: none; cursor: pointer; transition: opacity .15s, transform .15s; }
+  .tbtn:active { transform: scale(.94); opacity: .85; }
+  .tbtn-main { flex: 1; max-width: 200px; background: var(--green); color: var(--dark); }
+  .tbtn-pause-run { flex: 1; max-width: 200px; background: rgba(181,242,61,.12); color: var(--green); border: 1.5px solid rgba(181,242,61,.3); }
+  .tbtn-pause-walk { flex: 1; max-width: 200px; background: rgba(61,232,242,.1); color: var(--blue); border: 1.5px solid rgba(61,232,242,.25); }
+  .tbtn-reset { background: rgba(255,255,255,.07); color: var(--muted); border: 1.5px solid rgba(255,255,255,.08); padding: 13px 14px; }
+
+  /* ============ GYM REST TIMER ============ */
+  .rest-timer-btn { display: inline-flex; align-items: center; gap: 6px; background: rgba(61,232,242,.08); border: 1.5px solid rgba(61,232,242,.2); color: var(--blue); font-family: 'DM Sans',sans-serif; font-size: 12px; font-weight: 700; padding: 9px 14px; border-radius: 10px; cursor: pointer; margin-top: 10px; transition: opacity .15s; }
+  .rest-timer-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .rest-timer-btn:not(:disabled):active { opacity: .7; }
+  .rest-timer-cd { display: none; font-family: 'Bebas Neue',sans-serif; font-size: 42px; color: var(--blue); text-align: center; padding: 10px 0 2px; letter-spacing: 1px; }
+  .rest-timer-cd.active { display: block; }
+  .rest-timer-cd.cd-done { color: var(--green); }
+
+  /* ============ PROGRESS SCREEN ============ */
+  .prog-screen { padding: 20px; }
+
+  .prog-header { margin-bottom: 20px; }
+  .prog-title { font-family: 'Bebas Neue',sans-serif; font-size: 28px; color: var(--green); letter-spacing: 1px; }
+  .prog-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* Month selector */
+  .month-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+  .month-bar::-webkit-scrollbar { display: none; }
+  .month-btn { flex-shrink: 0; background: var(--card); border: 1.5px solid transparent; color: var(--muted); font-family: 'DM Sans',sans-serif; font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
+  .month-btn.active { background: rgba(181,242,61,.12); border-color: var(--green); color: var(--green); }
+  .add-month-btn { flex-shrink: 0; background: rgba(181,242,61,.08); border: 1.5px dashed rgba(181,242,61,.3); color: var(--green); font-size: 18px; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+  /* Compare banner */
+  .compare-banner { background: rgba(181,242,61,.06); border: 1px solid rgba(181,242,61,.15); border-radius: 14px; padding: 14px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+  .compare-icon { font-size: 24px; flex-shrink: 0; }
+  .compare-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .compare-text strong { color: var(--green); }
+
+  /* Category tabs */
+  .cat-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none; }
+  .cat-tabs::-webkit-scrollbar { display: none; }
+  .cat-tab { flex-shrink: 0; background: var(--card); border: 1.5px solid transparent; color: var(--muted); font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
+  .cat-tab.active { border-color: var(--blue); color: var(--blue); background: rgba(61,232,242,.08); }
+  .cat-tab.run-tab.active { border-color: var(--green); color: var(--green); background: rgba(181,242,61,.08); }
+  .cat-content { display: none; }
+  .cat-content.active { display: block; }
+
+  /* Exercise entry */
+  .ex-entry { background: var(--card); border-radius: 14px; margin-bottom: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,.04); }
+  .ex-header { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .ex-header:active { background: rgba(255,255,255,.03); }
+  .ex-name { font-weight: 700; font-size: 14px; color: var(--text); }
+  .ex-current { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .ex-current span { color: var(--blue); font-weight: 700; }
+  .ex-chevron { color: var(--muted); font-size: 16px; transition: transform .3s; flex-shrink: 0; }
+  .ex-entry.open .ex-chevron { transform: rotate(180deg); }
+  .ex-body { display: none; padding: 0 16px 16px; }
+  .ex-entry.open .ex-body { display: block; }
+
+  /* Input row */
+  .input-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 12px; }
+  .input-group { flex: 1; }
+  .input-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .input-field { width: 100%; background: var(--card2); border: 1.5px solid rgba(255,255,255,.08); color: var(--text); font-family: 'DM Sans',sans-serif; font-size: 15px; font-weight: 700; padding: 10px 12px; border-radius: 10px; outline: none; }
+  .input-field:focus { border-color: rgba(61,232,242,.4); }
+  .input-field.run-field:focus { border-color: rgba(181,242,61,.4); }
+  .input-unit { font-size: 12px; color: var(--muted); padding-bottom: 12px; flex-shrink: 0; }
+  .save-btn { background: rgba(61,232,242,.12); border: 1.5px solid rgba(61,232,242,.3); color: var(--blue); font-family: 'DM Sans',sans-serif; font-size: 13px; font-weight: 700; padding: 10px 18px; border-radius: 10px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .save-btn:active { opacity: .7; }
+  .save-btn.run-save { background: rgba(181,242,61,.1); border-color: rgba(181,242,61,.3); color: var(--green); }
+
+  /* History list */
+  .history-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .history-list { display: flex; flex-direction: column; gap: 6px; }
+  .history-item { background: var(--card2); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; }
+  .history-month { font-size: 11px; font-weight: 700; color: var(--muted); }
+  .history-val { font-family: 'Bebas Neue',sans-serif; font-size: 20px; color: var(--blue); }
+  .history-val.run-val { color: var(--green); }
+  .history-diff { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+  .history-diff.up { background: rgba(181,242,61,.15); color: var(--green); }
+  .history-diff.down { background: rgba(255,92,43,.12); color: var(--accent); }
+  .history-diff.same { background: rgba(255,255,255,.06); color: var(--muted); }
+  .no-history { font-size: 13px; color: var(--muted); font-style: italic; }
+
+  /* Run entries */
+  .run-entry { background: var(--card); border-radius: 14px; margin-bottom: 10px; padding: 16px; border-left: 3px solid var(--green); }
+  .run-entry-title { font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 12px; }
+
+  /* Empty */
+  #empty { text-align: center; padding: 50px 0; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 300; display: none; align-items: flex-end; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #1a2410; border-radius: 20px 20px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 480px; }
+  .modal-title { font-family: 'Bebas Neue',sans-serif; font-size: 22px; color: var(--green); letter-spacing: 1px; margin-bottom: 16px; }
+  .modal-input { width: 100%; background: var(--card2); border: 1.5px solid rgba(181,242,61,.2); color: var(--text); font-family: 'DM Sans',sans-serif; font-size: 16px; padding: 12px 14px; border-radius: 12px; outline: none; margin-bottom: 12px; }
+  .modal-input:focus { border-color: var(--green); }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-confirm { flex: 1; background: var(--green); color: var(--dark); font-family: 'DM Sans',sans-serif; font-size: 14px; font-weight: 700; padding: 13px; border-radius: 12px; cursor: pointer; border: none; }
+  .modal-cancel { background: var(--card2); color: var(--muted); font-family: 'DM Sans',sans-serif; font-size: 14px; font-weight: 700; padding: 13px 20px; border-radius: 12px; cursor: pointer; border: none; }
+
+  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--green); color: var(--dark); font-weight: 700; font-size: 13px; padding: 10px 20px; border-radius: 20px; z-index: 400; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">🐊 Time Híbrido</div>
+  <h1>DESAFIO <span>ATLETA</span><br><span>HÍBRIDO</span></h1>
+  <div class="header-sub">Eduardo Lima</div>
+</div>
+
+<!-- ====== SCREEN: TREINO ====== -->
+<div id="screen-treino" class="screen active">
+  <div class="day-selector">
+    <div class="day-selector-label">Qual dia é hoje?</div>
+    <div class="days-grid">
+      <div class="day-btn gym-day" onclick="selectDay('seg',this)"><div class="d-name">SEG</div><span class="d-icon">💪</span><div class="d-type">Treino A</div></div>
+      <div class="day-btn gym-day" onclick="selectDay('ter',this)"><div class="d-name">TER</div><span class="d-icon">🦵</span><div class="d-type">Treino B</div></div>
+      <div class="day-btn run-day" onclick="selectDay('qua',this)"><div class="d-name">QUA</div><span class="d-icon">🏃</span><div class="d-type">Corrida</div></div>
+      <div class="day-btn gym-day" onclick="selectDay('qui',this)"><div class="d-name">QUI</div><span class="d-icon">🔙</span><div class="d-type">Treino C</div></div>
+      <div class="day-btn run-day" onclick="selectDay('sex',this)"><div class="d-name">SEX</div><span class="d-icon">🏃</span><div class="d-type">Corrida</div></div>
+      <div class="day-btn gym-day" onclick="selectDay('sab',this)"><div class="d-name">SÁB</div><span class="d-icon">🔥</span><div class="d-type">Treino D</div></div>
+      <div class="day-btn run-day" onclick="selectDay('dom',this)"><div class="d-name">DOM</div><span class="d-icon">🏃</span><div class="d-type">Corrida</div></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div id="empty" class="day-content active" style="text-align:center;padding:50px 0">
+      <div style="font-size:48px;margin-bottom:16px">👆</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--green);letter-spacing:1px">Selecione o dia acima</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:8px">e veja os treinos do dia</div>
+    </div>
+
+    <!-- SEG -->
+    <div id="seg" class="day-content">
+      <div class="day-hero gym-hero"><div class="hero-icon">💪</div><div><div class="hero-title">TREINO A</div><div class="hero-sub">Peito, Ombro e Tríceps</div></div></div>
+      <div class="block gym-block"><div class="block-label">Bloco 01 · Aquecimento</div><div class="block-title">Aquecimento e Mobilidade — Membros Superiores</div><div class="block-meta"><span class="tag blue">Intervalo: 1 min</span></div><a href="https://www.youtube.com/watch?v=M8goKw7_-tU" target="_blank" class="video-btn blue-btn">▶ Vídeo: Aquecimento</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 02 · Bi-set</div><div class="block-title">3 × 15 Flexão no Solo + 15 Elevação Lateral</div><div class="block-meta"><span class="tag blue">3 séries · 15+15 reps</span><span class="tag blue">Intervalo: 90 seg</span></div><a href="https://www.youtube.com/watch?v=X6VqXSqm6OA" target="_blank" class="video-btn blue-btn">▶ Flexão + Elevação Lateral</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 03 · Bi-set</div><div class="block-title">3 × 15 Supino Reto + 15 Elevação Frontal</div><div class="block-meta"><span class="tag blue">3 séries · 15+15 reps</span><span class="tag blue">Intervalo: 90 seg</span></div><a href="https://www.youtube.com/watch?v=Fdb6lfKW8EU" target="_blank" class="video-btn blue-btn">▶ Supino Reto + Elevação Frontal</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 04 · Bi-set</div><div class="block-title">3 × 15 Supino Inclinado c/ Halteres + 15 Flexão Militar</div><div class="block-meta"><span class="tag blue">3 séries · 15+15 reps</span><span class="tag blue">Intervalo: 90 seg</span></div><a href="https://www.youtube.com/watch?v=WHJ-8Jr8Ug4" target="_blank" class="video-btn blue-btn">▶ Supino Inclinado + Flexão Militar</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 05 · Bi-set</div><div class="block-title">3 × 15 Voador Polia Alta + 15 Tríceps Coice c/ Halteres</div><div class="block-meta"><span class="tag blue">3 séries · 15+15 reps</span><span class="tag blue">Intervalo: 90 seg</span></div><a href="https://www.youtube.com/watch?v=OXgLJbVtIYk" target="_blank" class="video-btn blue-btn">▶ Voador + Tríceps Coice</a></div>
+    </div>
+
+    <!-- TER -->
+    <div id="ter" class="day-content">
+      <div class="day-hero gym-hero"><div class="hero-icon">🦵</div><div><div class="hero-title">TREINO B</div><div class="hero-sub">Membros Inferiores</div></div></div>
+      <div class="block gym-block"><div class="block-label">Bloco 01 · Aquecimento</div><div class="block-title">Flexibilidade e Mobilidade Inferiores + Agachamento c/ Peso do Corpo</div><div class="block-meta"><span class="tag blue">Intervalo: 45 seg</span></div><a href="https://www.youtube.com/watch?v=sBJK1MU1JGg" target="_blank" class="video-btn blue-btn">▶ Mobilidade</a><a href="https://www.youtube.com/watch?v=oM4dQnw2r44" target="_blank" class="video-btn blue-btn">▶ Agachamento</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 02 · Meta de Repetição</div><div class="block-title">3 × 15 Cadeira Extensora</div><div class="block-meta"><span class="tag blue">3 séries · 15 reps</span><span class="tag blue">Intervalo: 1 min</span></div><a href="https://www.youtube.com/watch?v=I_s_nJzuIt0" target="_blank" class="video-btn blue-btn">▶ Cadeira Extensora</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 03 · Meta de Repetição</div><div class="block-title">3 × 15 Leg Press 45</div><div class="block-meta"><span class="tag blue">3 séries · 15 reps</span><span class="tag blue">Intervalo: 45 seg</span></div><a href="https://www.youtube.com/watch?v=XrwFXYahprI" target="_blank" class="video-btn blue-btn">▶ Leg Press 45</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 04 · Meta de Repetição</div><div class="block-title">3 × 15 Mesa Flexora</div><div class="block-meta"><span class="tag blue">3 séries · 15 reps</span><span class="tag blue">Intervalo: 45 seg</span></div><a href="https://www.youtube.com/watch?v=0puAmlxM_i8" target="_blank" class="video-btn blue-btn">▶ Flexora Deitada</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 05 · Meta de Repetição</div><div class="block-title">3 × 15 Agachamento Hack</div><div class="block-meta"><span class="tag blue">3 séries · 15 reps</span><span class="tag blue">Intervalo: 45 seg</span></div><a href="https://www.youtube.com/watch?v=rRts63f3lpg" target="_blank" class="video-btn blue-btn">▶ Agachamento Hack</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 06 · Bi-set</div><div class="block-title">3 × 15 Cadeira Abdutora + 15 Panturrilha em Pé</div><div class="block-meta"><span class="tag blue">3 séries · 15+15 reps</span><span class="tag blue">Intervalo: 45 seg</span></div><a href="https://www.youtube.com/watch?v=Rg25JFpGLGg" target="_blank" class="video-btn blue-btn">▶ Abdutora</a><a href="https://www.youtube.com/watch?v=SsNlVHY15Xs" target="_blank" class="video-btn blue-btn">▶ Panturrilha</a></div>
+    </div>
+
+    <!-- QUA -->
+    <div id="qua" class="day-content">
+      <div class="day-hero run-hero"><div class="hero-icon">🏃</div><div><div class="hero-title">CORRIDA</div><div class="hero-sub">Quarta · 7 tiros de 30 segundos</div></div></div>
+      <div class="block"><div class="block-label">Passo 1 · Aquecimento</div><div class="block-title">Faça o aquecimento dinâmico antes de correr</div><a href="https://www.youtube.com/watch?v=n3oSXWHxRZc" target="_blank" class="video-btn">▶ Vídeo: Aquecimento</a></div>
+      <div class="block"><div class="block-label">Passo 2 · Entrada</div><div class="run-phase"><div class="run-phase-icon">🚶</div><div class="run-phase-info"><div class="run-phase-title">CAMINHE tranquilo</div><div class="run-phase-desc">Respire fundo, prepare o corpo</div></div><div class="run-phase-time">5 MIN</div></div></div>
+      <div class="block"><div class="block-label">Passo 3 · 7 tiros 🔥</div><div class="block-title" style="margin-bottom:4px">Repita <span style="color:var(--green)">7 vezes:</span></div><div style="font-size:12px;color:var(--muted);margin-bottom:14px">Use o timer abaixo — ele muda automaticamente de CORRA para CAMINHE.</div>
+        <div class="run-timer" id="timer-qua">
+          <div class="run-timer-phase" id="phase-qua">Pronto para começar</div>
+          <div class="run-timer-display" id="display-qua">0:30</div>
+          <div class="run-timer-bar"><div class="run-timer-fill" id="fill-qua"></div></div>
+          <div class="run-timer-round" id="round-qua">— / 7 tiros</div>
+          <div class="run-timer-btns">
+            <button class="tbtn tbtn-main" id="btn-qua" onclick="timerAction('qua')">▶ INICIAR</button>
+            <button class="tbtn tbtn-reset" onclick="timerReset('qua')">↺</button>
+          </div>
+        </div>
+        <div class="round-card"><div class="round-step"><div class="step-action"><div class="step-dot run-dot"></div><div><div class="step-verb run-verb">CORRA</div><div class="step-intensity">Difícil falar, respiração acelerada</div></div></div><div style="text-align:right"><div class="step-time run-time">30</div><div class="step-unit">segundos</div></div></div><div class="round-step"><div class="step-action"><div class="step-dot walk-dot"></div><div><div class="step-verb walk-verb">CAMINHE</div><div class="step-intensity">Recupere o fôlego</div></div></div><div style="text-align:right"><div class="step-time walk-time">90</div><div class="step-unit">segundos</div></div></div></div>
+        <div class="round-dots"><div class="rdot" onclick="toggleDot(this)"><span>1</span></div><div class="rdot" onclick="toggleDot(this)"><span>2</span></div><div class="rdot" onclick="toggleDot(this)"><span>3</span></div><div class="rdot" onclick="toggleDot(this)"><span>4</span></div><div class="rdot" onclick="toggleDot(this)"><span>5</span></div><div class="rdot" onclick="toggleDot(this)"><span>6</span></div><div class="rdot" onclick="toggleDot(this)"><span>7</span></div></div>
+      </div>
+      <div class="block"><div class="block-label">Passo 4 · Finalizar</div><div class="run-phase"><div class="run-phase-icon">🚶</div><div class="run-phase-info"><div class="run-phase-title">CAMINHE para desacelerar</div><div class="run-phase-desc">Abaixe a frequência cardíaca</div></div><div class="run-phase-time">5 MIN</div></div><a href="https://www.youtube.com/watch?v=PMMe4m4A7jI" target="_blank" class="video-btn" style="margin-top:8px">▶ Vídeo do treino</a></div>
+      <div class="run-summary"><div class="summary-item"><div class="summary-val">7</div><div class="summary-lbl">tiros</div></div><div class="summary-item"><div class="summary-val">30s</div><div class="summary-lbl">correndo</div></div><div class="summary-item"><div class="summary-val">90s</div><div class="summary-lbl">caminhando</div></div><div class="summary-item"><div class="summary-val">~20</div><div class="summary-lbl">min total</div></div></div>
+    </div>
+
+    <!-- QUI -->
+    <div id="qui" class="day-content">
+      <div class="day-hero gym-hero"><div class="hero-icon">🔙</div><div><div class="hero-title">TREINO C</div><div class="hero-sub">Costas e Bíceps</div></div></div>
+      <div class="block gym-block"><div class="block-label">Bloco 01 · Aquecimento</div><div class="block-title">Aquecimento e Mobilidade — Membros Superiores</div><div class="block-meta"><span class="tag blue">Intervalo: 1 min</span></div><a href="https://www.youtube.com/watch?v=M8goKw7_-tU" target="_blank" class="video-btn blue-btn">▶ Aquecimento superiores</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 02 · 6 Pesada / 12 Leve ⚡</div><div class="block-title">3 × 6/12 Remada Cavalinho</div><div class="block-meta"><span class="tag orange">6 reps pesadas</span><span class="tag gray">→ 12 reps leves</span><span class="tag blue">Intervalo: 2 min</span></div><a href="https://www.youtube.com/watch?v=LtlC2kvF8_g" target="_blank" class="video-btn blue-btn">▶ Remada Cavalinho 6×12</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 03 · Bi-set</div><div class="block-title">3 × 15 Puxada Alta + 15 Remada com Halteres</div><div class="block-meta"><span class="tag blue">3 séries · 15+15 reps</span><span class="tag blue">Intervalo: 90 seg</span></div><a href="https://www.youtube.com/watch?v=rgF7Pxhl1t0" target="_blank" class="video-btn blue-btn">▶ Puxada Alta + Remada</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 04 · Bi-set</div><div class="block-title">3 × 15 Crucifixo Invertido c/ Halteres + 15 Remada Baixa</div><div class="block-meta"><span class="tag blue">3 séries · 15+15 reps</span><span class="tag blue">Intervalo: 90 seg</span></div><a href="https://www.youtube.com/watch?v=8T0lJXVFsVg" target="_blank" class="video-btn blue-btn">▶ Crucifixo Inv. + Remada Baixa</a></div>
+      <div class="block gym-block"><div class="block-label">Bloco 05 · Meta de Repetição</div><div class="block-title">3 × 15 Bíceps Martelo</div><div class="block-meta"><span class="tag blue">3 séries · 15 reps</span><span class="tag blue">Intervalo: 45 seg</span></div><a href="https://www.youtube.com/watch?v=64MVKBH1QS8" target="_blank" class="video-btn blue-btn">▶ Bíceps Martelo</a></div>
+    </div>
+
+    <!-- SEX -->
+    <div id="sex" class="day-content">
+      <div class="day-hero run-hero"><div class="hero-icon">🏃</div><div><div class="hero-title">CORRIDA</div><div class="hero-sub">Sexta · 7 tiros de 45 segundos</div></div></div>
+      <div class="block"><div class="block-label">Passo 1 · Aquecimento</div><div class="block-title">Faça o aquecimento dinâmico antes de correr</div><a href="https://www.youtube.com/watch?v=n3oSXWHxRZc" target="_blank" class="video-btn">▶ Vídeo: Aquecimento</a></div>
+      <div class="block"><div class="block-label">Passo 2 · Entrada</div><div class="run-phase"><div class="run-phase-icon">🚶</div><div class="run-phase-info"><div class="run-phase-title">CAMINHE tranquilo</div><div class="run-phase-desc">Respire fundo, prepare o corpo</div></div><div class="run-phase-time">5 MIN</div></div></div>
+      <div class="block"><div class="block-label">Passo 3 · 7 tiros 🔥</div><div class="block-title" style="margin-bottom:4px">Repita <span style="color:var(--green)">7 vezes:</span></div><div style="font-size:12px;color:var(--muted);margin-bottom:14px">Tiros mais longos que na quarta — use o timer. Você consegue! 💪</div>
+        <div class="run-timer" id="timer-sex">
+          <div class="run-timer-phase" id="phase-sex">Pronto para começar</div>
+          <div class="run-timer-display" id="display-sex">0:45</div>
+          <div class="run-timer-bar"><div class="run-timer-fill" id="fill-sex"></div></div>
+          <div class="run-timer-round" id="round-sex">— / 7 tiros</div>
+          <div class="run-timer-btns">
+            <button class="tbtn tbtn-main" id="btn-sex" onclick="timerAction('sex')">▶ INICIAR</button>
+            <button class="tbtn tbtn-reset" onclick="timerReset('sex')">↺</button>
+          </div>
+        </div>
+        <div class="round-card"><div class="round-step"><div class="step-action"><div class="step-dot run-dot"></div><div><div class="step-verb run-verb">CORRA</div><div class="step-intensity">Difícil falar, respiração acelerada</div></div></div><div style="text-align:right"><div class="step-time run-time">45</div><div class="step-unit">segundos</div></div></div><div class="round-step"><div class="step-action"><div class="step-dot walk-dot"></div><div><div class="step-verb walk-verb">CAMINHE</div><div class="step-intensity">Recupere o fôlego</div></div></div><div style="text-align:right"><div class="step-time walk-time">90</div><div class="step-unit">segundos</div></div></div></div>
+        <div class="round-dots"><div class="rdot" onclick="toggleDot(this)"><span>1</span></div><div class="rdot" onclick="toggleDot(this)"><span>2</span></div><div class="rdot" onclick="toggleDot(this)"><span>3</span></div><div class="rdot" onclick="toggleDot(this)"><span>4</span></div><div class="rdot" onclick="toggleDot(this)"><span>5</span></div><div class="rdot" onclick="toggleDot(this)"><span>6</span></div><div class="rdot" onclick="toggleDot(this)"><span>7</span></div></div>
+      </div>
+      <div class="block"><div class="block-label">Passo 4 · Finalizar</div><div class="run-phase"><div class="run-phase-icon">🚶</div><div class="run-phase-info"><div class="run-phase-title">CAMINHE para desacelerar</div><div class="run-phase-desc">Abaixe a frequência cardíaca</div></div><div class="run-phase-time">5 MIN</div></div><a href="https://www.youtube.com/watch?v=PMMe4m4A7jI" target="_blank" class="video-btn" style="margin-top:8px">▶ Vídeo do treino</a></div>
+      <div class="run-summary"><div class="summary-item"><div class="summary-val">7</div><div class="summary-lbl">tiros</div></div><div class="summary-item"><div class="summary-val">45s</div><div class="summary-lbl">correndo</div></div><div class="summary-item"><div class="summary-val">90s</div><div class="summary-lbl">caminhando</div></div><div class="summary-item"><div class="summary-val">~22</div><div class="summary-lbl">min total</div></div></div>
+    </div>
+
+    <!-- SÁB -->
+    <div id="sab" class="day-content">
+      <div class="day-hero abs-hero"><div class="hero-icon">🔥</div><div><div class="hero-title">TREINO D</div><div class="hero-sub">HIIT Abdominal · Tabata 4 min</div></div></div>
+      <div class="block abs-block"><div class="block-label">Bloco 01 · Circuito completo</div><div class="block-title">Tabata Abdominal</div><div class="block-meta"><span class="tag orange">20 seg esforço</span><span class="tag gray">10 seg descanso</span></div>
+        <div class="hiit-item"><div class="hiit-num">1</div><div class="hiit-name">Abdominal Crunch</div><div class="hiit-time">20 seg</div></div>
+        <div class="rest-row"><div class="rest-bar"></div><div class="rest-label">DESCANSO 10 seg</div><div class="rest-bar"></div></div>
+        <div class="hiit-item"><div class="hiit-num">2</div><div class="hiit-name">Elevação de Pernas c/ Joelho Flexionado</div><div class="hiit-time">20 seg</div></div>
+        <div class="rest-row"><div class="rest-bar"></div><div class="rest-label">DESCANSO 10 seg</div><div class="rest-bar"></div></div>
+        <div class="hiit-item"><div class="hiit-num">3</div><div class="hiit-name">Abdominal Remador</div><div class="hiit-time">20 seg</div></div>
+        <div class="rest-row"><div class="rest-bar"></div><div class="rest-label">DESCANSO 10 seg</div><div class="rest-bar"></div></div>
+        <div class="hiit-item"><div class="hiit-num">4</div><div class="hiit-name">Prancha Abdominal</div><div class="hiit-time">20 seg</div></div>
+        <div class="rest-row"><div class="rest-bar"></div><div class="rest-label">DESCANSO 10 seg</div><div class="rest-bar"></div></div>
+        <div class="hiit-item"><div class="hiit-num">5</div><div class="hiit-name">Abdominal Crunch</div><div class="hiit-time">20 seg</div></div>
+        <div class="rest-row"><div class="rest-bar"></div><div class="rest-label">DESCANSO 10 seg</div><div class="rest-bar"></div></div>
+        <div class="hiit-item"><div class="hiit-num">6</div><div class="hiit-name">Elevação de Pernas c/ Joelho Flexionado</div><div class="hiit-time">20 seg</div></div>
+        <div class="rest-row"><div class="rest-bar"></div><div class="rest-label">DESCANSO 10 seg</div><div class="rest-bar"></div></div>
+        <div class="hiit-item"><div class="hiit-num">7</div><div class="hiit-name">Abdominal Remador</div><div class="hiit-time">20 seg</div></div>
+        <div class="rest-row"><div class="rest-bar"></div><div class="rest-label">DESCANSO 10 seg</div><div class="rest-bar"></div></div>
+        <div class="hiit-item"><div class="hiit-num">8</div><div class="hiit-name">Prancha Abdominal</div><div class="hiit-time">20 seg</div></div>
+        <div style="margin-top:14px"><a href="https://www.youtube.com/watch?v=dL8YAQLmKDY" target="_blank" class="video-btn orange-btn">▶ Vídeo: HIIT Abdominal</a></div>
+      </div>
+    </div>
+
+    <!-- DOM -->
+    <div id="dom" class="day-content">
+      <div class="day-hero run-hero"><div class="hero-icon">🏃</div><div><div class="hero-title">CORRIDA</div><div class="hero-sub">Domingo · 7 tiros de 1 minuto</div></div></div>
+      <div class="block"><div class="block-label">Passo 1 · Aquecimento</div><div class="block-title">Faça o aquecimento dinâmico antes de correr</div><a href="https://www.youtube.com/watch?v=n3oSXWHxRZc" target="_blank" class="video-btn">▶ Vídeo: Aquecimento</a></div>
+      <div class="block"><div class="block-label">Passo 2 · Entrada</div><div class="run-phase"><div class="run-phase-icon">🚶</div><div class="run-phase-info"><div class="run-phase-title">CAMINHE tranquilo</div><div class="run-phase-desc">Respire fundo, prepare o corpo</div></div><div class="run-phase-time">5 MIN</div></div></div>
+      <div class="block"><div class="block-label">Passo 3 · 7 tiros 🔥</div><div class="block-title" style="margin-bottom:4px">Repita <span style="color:var(--green)">7 vezes:</span></div><div style="font-size:12px;color:var(--muted);margin-bottom:14px">O mais desafiador da semana. Use o timer. Chegou até aqui! 🏆</div>
+        <div class="run-timer" id="timer-dom">
+          <div class="run-timer-phase" id="phase-dom">Pronto para começar</div>
+          <div class="run-timer-display" id="display-dom">1:00</div>
+          <div class="run-timer-bar"><div class="run-timer-fill" id="fill-dom"></div></div>
+          <div class="run-timer-round" id="round-dom">— / 7 tiros</div>
+          <div class="run-timer-btns">
+            <button class="tbtn tbtn-main" id="btn-dom" onclick="timerAction('dom')">▶ INICIAR</button>
+            <button class="tbtn tbtn-reset" onclick="timerReset('dom')">↺</button>
+          </div>
+        </div>
+        <div class="round-card"><div class="round-step"><div class="step-action"><div class="step-dot run-dot"></div><div><div class="step-verb run-verb">CORRA</div><div class="step-intensity">Difícil falar, respiração acelerada</div></div></div><div style="text-align:right"><div class="step-time run-time">1</div><div class="step-unit">minuto</div></div></div><div class="round-step"><div class="step-action"><div class="step-dot walk-dot"></div><div><div class="step-verb walk-verb">CAMINHE</div><div class="step-intensity">Recupere o fôlego</div></div></div><div style="text-align:right"><div class="step-time walk-time">1</div><div class="step-unit">minuto</div></div></div></div>
+        <div class="round-dots"><div class="rdot" onclick="toggleDot(this)"><span>1</span></div><div class="rdot" onclick="toggleDot(this)"><span>2</span></div><div class="rdot" onclick="toggleDot(this)"><span>3</span></div><div class="rdot" onclick="toggleDot(this)"><span>4</span></div><div class="rdot" onclick="toggleDot(this)"><span>5</span></div><div class="rdot" onclick="toggleDot(this)"><span>6</span></div><div class="rdot" onclick="toggleDot(this)"><span>7</span></div></div>
+      </div>
+      <div class="block"><div class="block-label">Passo 4 · Finalizar</div><div class="run-phase"><div class="run-phase-icon">🚶</div><div class="run-phase-info"><div class="run-phase-title">CAMINHE para desacelerar</div><div class="run-phase-desc">Abaixe a frequência cardíaca</div></div><div class="run-phase-time">5 MIN</div></div><a href="https://www.youtube.com/watch?v=XXKGgbXsSYk" target="_blank" class="video-btn" style="margin-top:8px">▶ Vídeo do treino</a></div>
+      <div class="run-summary"><div class="summary-item"><div class="summary-val">7</div><div class="summary-lbl">tiros</div></div><div class="summary-item"><div class="summary-val">1min</div><div class="summary-lbl">correndo</div></div><div class="summary-item"><div class="summary-val">1min</div><div class="summary-lbl">caminhando</div></div><div class="summary-item"><div class="summary-val">~24</div><div class="summary-lbl">min total</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SCREEN: PROGRESSO ====== -->
+<div id="screen-prog" class="screen">
+  <div class="prog-screen">
+    <div class="prog-header">
+      <div class="prog-title">📈 MEU PROGRESSO</div>
+      <div class="prog-sub">Registre suas cargas e tempos por mês</div>
+    </div>
+
+    <div class="month-bar" id="monthBar">
+      <div class="add-month-btn" onclick="openAddMonth()" title="Novo mês">+</div>
+    </div>
+
+    <div class="compare-banner" id="compareBanner" style="display:none">
+      <div class="compare-icon">⚡</div>
+      <div class="compare-text" id="compareText"></div>
+    </div>
+
+    <div class="cat-tabs">
+      <div class="cat-tab active run-tab" onclick="selectCat('corrida',this)">🏃 Corrida</div>
+      <div class="cat-tab" onclick="selectCat('treinoA',this)">💪 Treino A</div>
+      <div class="cat-tab" onclick="selectCat('treinoB',this)">🦵 Treino B</div>
+      <div class="cat-tab" onclick="selectCat('treinoC',this)">🔙 Treino C</div>
+    </div>
+
+    <!-- CORRIDA -->
+    <div id="cat-corrida" class="cat-content active">
+      <div class="run-entry">
+        <div class="run-entry-title">🏃 Distância / Tempo corridos</div>
+        <div class="input-row">
+          <div class="input-group"><div class="input-label">Distância</div><input class="input-field run-field" id="run-dist" type="number" step="0.1" placeholder="3.2"></div>
+          <div class="input-unit">km</div>
+          <div class="input-group"><div class="input-label">Tempo total</div><input class="input-field run-field" id="run-time" type="number" placeholder="22"></div>
+          <div class="input-unit">min</div>
+          <button class="save-btn run-save" onclick="saveRun()">Salvar</button>
+        </div>
+        <div class="history-label">Histórico</div>
+        <div class="history-list" id="run-history"></div>
+      </div>
+
+      <div class="run-entry">
+        <div class="run-entry-title">⏱ Tiro mais longo aguentado</div>
+        <div class="input-row">
+          <div class="input-group"><div class="input-label">Segundos correndo</div><input class="input-field run-field" id="run-tiro" type="number" placeholder="45"></div>
+          <div class="input-unit">seg</div>
+          <button class="save-btn run-save" onclick="saveTiro()">Salvar</button>
+        </div>
+        <div class="history-label">Histórico</div>
+        <div class="history-list" id="tiro-history"></div>
+      </div>
+    </div>
+
+    <!-- TREINO A -->
+    <div id="cat-treinoA" class="cat-content">
+      <div id="entries-treinoA"></div>
+    </div>
+    <!-- TREINO B -->
+    <div id="cat-treinoB" class="cat-content">
+      <div id="entries-treinoB"></div>
+    </div>
+    <!-- TREINO C -->
+    <div id="cat-treinoC" class="cat-content">
+      <div id="entries-treinoC"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="bnav-btn active" onclick="showScreen('treino',this)">
+    <span class="bnav-icon">🏋️</span>Treino
+  </button>
+  <button class="bnav-btn" onclick="showScreen('prog',this)">
+    <span class="bnav-icon">📈</span>Progresso
+  </button>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">NOVO MÊS</div>
+    <input class="modal-input" id="modalInput" placeholder="Ex: Mês 1 · Maio/25" maxlength="30">
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-confirm" onclick="confirmAddMonth()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ DATA ============
+const EXERCISES = {
+  treinoA: [
+    'Flexão no Solo','Elevação Lateral','Supino Reto','Elevação Frontal',
+    'Supino Inclinado c/ Halteres','Flexão Militar','Voador Polia Alta','Tríceps Coice c/ Halteres'
+  ],
+  treinoB: [
+    'Cadeira Extensora','Leg Press 45','Mesa Flexora','Agachamento Hack',
+    'Cadeira Abdutora','Panturrilha em Pé'
+  ],
+  treinoC: [
+    'Remada Cavalinho','Puxada Alta','Remada com Halteres',
+    'Crucifixo Invertido c/ Halteres','Remada Baixa','Bíceps Martelo'
+  ]
+};
+
+let data = {};
+let currentMonth = null;
+
+function loadData() {
+  try { data = JSON.parse(localStorage.getItem('hibrido_progress') || '{}'); } catch(e) { data = {}; }
+  if (!data.months) data.months = [];
+  if (!data.records) data.records = {};
+}
+
+function saveData() {
+  localStorage.setItem('hibrido_progress', JSON.stringify(data));
+}
+
+// ============ MONTHS ============
+function renderMonths() {
+  const bar = document.getElementById('monthBar');
+  const addBtn = bar.querySelector('.add-month-btn');
+  bar.querySelectorAll('.month-btn').forEach(b => b.remove());
+
+  data.months.forEach(m => {
+    const btn = document.createElement('div');
+    btn.className = 'month-btn' + (currentMonth === m ? ' active' : '');
+    btn.textContent = m;
+    btn.onclick = () => selectMonth(m);
+    bar.insertBefore(btn, addBtn);
+  });
+
+  if (data.months.length === 0) document.getElementById('compareBanner').style.display = 'none';
+}
+
+function selectMonth(m) {
+  currentMonth = m;
+  renderMonths();
+  renderAll();
+  updateCompareBanner();
+}
+
+function openAddMonth() {
+  document.getElementById('modalInput').value = 'Mês ' + (data.months.length + 1);
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('modalInput').focus(), 100);
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function confirmAddMonth() {
+  const name = document.getElementById('modalInput').value.trim();
+  if (!name) return;
+  if (data.months.includes(name)) { showToast('Mês já existe!'); return; }
+  data.months.push(name);
+  saveData();
+  closeModal();
+  selectMonth(name);
+  showToast('✅ ' + name + ' adicionado!');
+}
+
+// ============ COMPARE BANNER ============
+function updateCompareBanner() {
+  const banner = document.getElementById('compareBanner');
+  const text = document.getElementById('compareText');
+  const idx = data.months.indexOf(currentMonth);
+  if (idx < 1) { banner.style.display = 'none'; return; }
+  const prev = data.months[idx - 1];
+  banner.style.display = 'flex';
+  text.innerHTML = `Comparando <strong>${currentMonth}</strong> com <strong>${prev}</strong>. Veja abaixo o quanto evoluiu em cada exercício 🚀`;
+}
+
+// ============ EXERCISES ============
+function renderAll() {
+  ['treinoA','treinoB','treinoC'].forEach(t => renderExercises(t));
+  renderRunHistory();
+}
+
+function renderExercises(treino) {
+  const container = document.getElementById('entries-' + treino);
+  container.innerHTML = '';
+  EXERCISES[treino].forEach(ex => container.appendChild(buildExEntry(ex, treino)));
+}
+
+function buildExEntry(name, treino) {
+  const key = treino + '_' + name;
+  const history = getHistory(key);
+  const current = history.find(h => h.month === currentMonth);
+
+  const div = document.createElement('div');
+  div.className = 'ex-entry';
+  div.id = 'ex_' + key.replace(/\s/g,'_');
+
+  const currentStr = current
+    ? `<span>${current.kg} kg</span> · ${current.reps} reps`
+    : '<span style="color:var(--muted)">Não registrado</span>';
+
+  div.innerHTML = `
+    <div class="ex-header" onclick="toggleEx(this)">
+      <div>
+        <div class="ex-name">${name}</div>
+        <div class="ex-current">Agora: ${currentStr}</div>
+      </div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-body">
+      ${currentMonth ? `
+      <div class="input-row">
+        <div class="input-group"><div class="input-label">Carga</div><input class="input-field" id="kg_${key.replace(/\s/g,'_')}" type="number" step="0.5" placeholder="10" value="${current ? current.kg : ''}"></div>
+        <div class="input-unit">kg</div>
+        <div class="input-group"><div class="input-label">Reps</div><input class="input-field" id="reps_${key.replace(/\s/g,'_')}" type="number" placeholder="15" value="${current ? current.reps : ''}"></div>
+        <div class="input-unit">reps</div>
+        <button class="save-btn" onclick="saveEx('${key}','${name}','${treino}')">Salvar</button>
+      </div>
+      ` : '<div style="font-size:13px;color:var(--muted);margin-bottom:12px">Selecione ou crie um mês para registrar.</div>'}
+      <div class="history-label">Histórico por mês</div>
+      <div class="history-list">${buildHistoryHTML(key, 'kg')}</div>
+    </div>
+  `;
+  return div;
+}
+
+function toggleEx(header) { header.parentElement.classList.toggle('open'); }
+
+function getHistory(key) { return (data.records[key] || []); }
+
+function buildHistoryHTML(key, unit) {
+  const history = getHistory(key);
+  if (history.length === 0) return '<div class="no-history">Nenhum registro ainda.</div>';
+
+  return history.map((h, i) => {
+    let diffHTML = '';
+    if (i > 0) {
+      const prev = history[i-1];
+      const diff = unit === 'kg'
+        ? (parseFloat(h.kg) - parseFloat(prev.kg)).toFixed(1)
+        : (parseFloat(h.val) - parseFloat(prev.val)).toFixed(1);
+      if (parseFloat(diff) > 0) diffHTML = `<div class="history-diff up">+${diff}${unit}</div>`;
+      else if (parseFloat(diff) < 0) diffHTML = `<div class="history-diff down">${diff}${unit}</div>`;
+      else diffHTML = `<div class="history-diff same">= mesmo</div>`;
+    }
+    const val = unit === 'kg' ? `${h.kg}kg · ${h.reps}r` : `${h.val}${unit}`;
+    return `<div class="history-item">
+      <div><div class="history-month">${h.month}</div></div>
+      <div class="history-val">${val}</div>
+      ${diffHTML}
+    </div>`;
+  }).join('');
+}
+
+function saveEx(key, name, treino) {
+  if (!currentMonth) { showToast('Selecione um mês primeiro!'); return; }
+  const safeKey = key.replace(/\s/g,'_');
+  const kg = document.getElementById('kg_' + safeKey)?.value;
+  const reps = document.getElementById('reps_' + safeKey)?.value;
+  if (!kg || !reps) { showToast('Preencha carga e repetições!'); return; }
+
+  if (!data.records[key]) data.records[key] = [];
+  const existing = data.records[key].findIndex(h => h.month === currentMonth);
+  const entry = { month: currentMonth, kg: parseFloat(kg), reps: parseInt(reps) };
+  if (existing >= 0) data.records[key][existing] = entry;
+  else data.records[key].push(entry);
+
+  saveData();
+  renderExercises(treino);
+  showToast('✅ Salvo!');
+}
+
+// ============ RUN ============
+function saveRun() {
+  if (!currentMonth) { showToast('Selecione um mês primeiro!'); return; }
+  const dist = document.getElementById('run-dist').value;
+  const time = document.getElementById('run-time').value;
+  if (!dist || !time) { showToast('Preencha distância e tempo!'); return; }
+  const key = 'run_dist';
+  if (!data.records[key]) data.records[key] = [];
+  const idx = data.records[key].findIndex(h => h.month === currentMonth);
+  const entry = { month: currentMonth, val: parseFloat(dist), extra: parseFloat(time) };
+  if (idx >= 0) data.records[key][idx] = entry;
+  else data.records[key].push(entry);
+  saveData();
+  renderRunHistory();
+  showToast('✅ Corrida salva!');
+}
+
+function saveTiro() {
+  if (!currentMonth) { showToast('Selecione um mês primeiro!'); return; }
+  const tiro = document.getElementById('run-tiro').value;
+  if (!tiro) { showToast('Preencha os segundos!'); return; }
+  const key = 'run_tiro';
+  if (!data.records[key]) data.records[key] = [];
+  const idx = data.records[key].findIndex(h => h.month === currentMonth);
+  const entry = { month: currentMonth, val: parseInt(tiro) };
+  if (idx >= 0) data.records[key][idx] = entry;
+  else data.records[key].push(entry);
+  saveData();
+  renderRunHistory();
+  showToast('✅ Tiro salvo!');
+}
+
+function renderRunHistory() {
+  const distRec = data.records['run_dist'] || [];
+  const tiroRec = data.records['run_tiro'] || [];
+
+  document.getElementById('run-history').innerHTML = distRec.length === 0
+    ? '<div class="no-history">Nenhum registro ainda.</div>'
+    : distRec.map((h, i) => {
+        let diffHTML = '';
+        if (i > 0) {
+          const diff = (h.val - distRec[i-1].val).toFixed(1);
+          if (parseFloat(diff) > 0) diffHTML = `<div class="history-diff up">+${diff}km</div>`;
+          else if (parseFloat(diff) < 0) diffHTML = `<div class="history-diff down">${diff}km</div>`;
+          else diffHTML = `<div class="history-diff same">= mesmo</div>`;
+        }
+        return `<div class="history-item">
+          <div><div class="history-month">${h.month}</div><div style="font-size:11px;color:var(--muted)">${h.extra} min</div></div>
+          <div class="history-val run-val">${h.val} km</div>
+          ${diffHTML}
+        </div>`;
+      }).join('');
+
+  document.getElementById('tiro-history').innerHTML = tiroRec.length === 0
+    ? '<div class="no-history">Nenhum registro ainda.</div>'
+    : tiroRec.map((h, i) => {
+        let diffHTML = '';
+        if (i > 0) {
+          const diff = h.val - tiroRec[i-1].val;
+          if (diff > 0) diffHTML = `<div class="history-diff up">+${diff}s</div>`;
+          else if (diff < 0) diffHTML = `<div class="history-diff down">${diff}s</div>`;
+          else diffHTML = `<div class="history-diff same">= mesmo</div>`;
+        }
+        return `<div class="history-item">
+          <div><div class="history-month">${h.month}</div></div>
+          <div class="history-val run-val">${h.val}s</div>
+          ${diffHTML}
+        </div>`;
+      }).join('');
+}
+
+// ============ NAV ============
+function showScreen(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function selectCat(id, btn) {
+  document.querySelectorAll('.cat-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('cat-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function selectDay(id, btn) {
+  document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  document.querySelector('.content').scrollIntoView({behavior:'smooth'});
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function toggleDot(el) {
+  el.classList.toggle('done');
+  const dots = el.closest('.round-dots').querySelectorAll('.rdot');
+  const allDone = [...dots].every(d => d.classList.contains('done'));
+  if (allDone) showToast('🎉 7 tiros concluídos! Arrasou!');
+}
+
+// ============ AUDIO ============
+let _actx = null;
+function _ctx() {
+  if (!_actx) _actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_actx.state === 'suspended') _actx.resume();
+  return _actx;
+}
+function beep(freq, dur, vol) {
+  try {
+    const c = _ctx();
+    const o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination);
+    o.frequency.value = freq || 880;
+    g.gain.setValueAtTime(vol || 0.25, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + (dur || 0.15));
+    o.start(); o.stop(c.currentTime + (dur || 0.15));
+  } catch(e) {}
+}
+function vib(p) { try { navigator.vibrate && navigator.vibrate(p); } catch(e) {} }
+function beepStart() { beep(880, 0.12); setTimeout(() => beep(1100, 0.12), 160); }
+function beepEnd()   { beep(440, 0.2);  setTimeout(() => beep(330,  0.3),  260); }
+function beepTick()  { beep(660, 0.07, 0.18); }
+
+// ============ RUNNING TIMERS ============
+const RUN_CFG = {
+  qua: { sprint: 30, rest: 90,  rounds: 7 },
+  sex: { sprint: 45, rest: 90,  rounds: 7 },
+  dom: { sprint: 60, rest: 60,  rounds: 7 }
+};
+const RT = {};
+
+function fmtSec(s) {
+  const m = Math.floor(s / 60), r = s % 60;
+  return m > 0 ? `${m}:${String(r).padStart(2,'0')}` : `0:${String(r).padStart(2,'0')}`;
+}
+
+function initRunTimers() {
+  Object.keys(RUN_CFG).forEach(day => {
+    RT[day] = { state: 'idle', round: 0, remaining: RUN_CFG[day].sprint, ivId: null, prevState: null };
+    rtUI(day);
+  });
+}
+
+function timerAction(day) {
+  const t = RT[day];
+  if (t.state === 'idle' || t.state === 'paused') rtGo(day);
+  else if (t.state === 'sprint' || t.state === 'rest') rtPause(day);
+  else if (t.state === 'done') timerReset(day);
+}
+
+function rtGo(day) {
+  const t = RT[day];
+  const cfg = RUN_CFG[day];
+  if (t.state === 'idle') {
+    t.round = 1;
+    t.remaining = cfg.sprint;
+    t.state = 'sprint';
+    beepStart();
+    vib(200);
+  } else if (t.state === 'paused') {
+    t.state = t.prevState;
+  }
+  clearInterval(t.ivId);
+  t.ivId = setInterval(() => rtTick(day), 1000);
+  rtUI(day);
+}
+
+function rtPause(day) {
+  const t = RT[day];
+  if (t.state !== 'sprint' && t.state !== 'rest') return;
+  t.prevState = t.state;
+  t.state = 'paused';
+  clearInterval(t.ivId);
+  t.ivId = null;
+  rtUI(day);
+}
+
+function timerReset(day) {
+  const t = RT[day];
+  clearInterval(t.ivId);
+  t.ivId = null;
+  t.state = 'idle';
+  t.round = 0;
+  t.remaining = RUN_CFG[day].sprint;
+  t.prevState = null;
+  document.querySelectorAll(`#${day} .rdot`).forEach(d => d.classList.remove('done'));
+  rtUI(day);
+}
+
+function rtTick(day) {
+  const t = RT[day];
+  const cfg = RUN_CFG[day];
+  t.remaining--;
+
+  if ([3, 2, 1].includes(t.remaining)) beepTick();
+
+  if (t.remaining <= 0) {
+    if (t.state === 'sprint') {
+      const dots = document.querySelectorAll(`#${day} .rdot`);
+      if (dots[t.round - 1]) dots[t.round - 1].classList.add('done');
+
+      if (t.round >= cfg.rounds) {
+        t.state = 'done';
+        clearInterval(t.ivId);
+        t.ivId = null;
+        beepEnd();
+        setTimeout(beepEnd, 420);
+        vib([200, 100, 200, 100, 400]);
+        showToast('🏆 Treino completo! Arrasou demais!');
+      } else {
+        t.state = 'rest';
+        t.remaining = cfg.rest;
+        beepEnd();
+        vib([200, 100, 200]);
+      }
+    } else if (t.state === 'rest') {
+      t.round++;
+      t.state = 'sprint';
+      t.remaining = cfg.sprint;
+      beepStart();
+      vib(300);
+    }
+  }
+
+  rtUI(day);
+}
+
+function rtUI(day) {
+  const t = RT[day];
+  const cfg = RUN_CFG[day];
+  const phEl    = document.getElementById('phase-'   + day);
+  const dispEl  = document.getElementById('display-' + day);
+  const fillEl  = document.getElementById('fill-'    + day);
+  const roundEl = document.getElementById('round-'   + day);
+  const btnEl   = document.getElementById('btn-'     + day);
+  if (!phEl) return;
+
+  phEl.className  = 'run-timer-phase';
+  dispEl.className = 'run-timer-display';
+
+  // Progress bar
+  if (fillEl) {
+    if (t.state === 'sprint' || t.state === 'rest') {
+      const total = t.state === 'sprint' ? cfg.sprint : cfg.rest;
+      fillEl.style.transition = 'width 1s linear, background .3s';
+      fillEl.style.width = (t.remaining / total * 100) + '%';
+      fillEl.style.background = t.state === 'sprint' ? 'var(--green)' : 'var(--blue)';
+    } else if (t.state === 'idle' || t.state === 'done') {
+      fillEl.style.transition = 'none';
+      fillEl.style.width = '100%';
+      fillEl.style.background = 'var(--green)';
+    }
+  }
+
+  switch (t.state) {
+    case 'idle':
+      phEl.textContent   = 'Pronto para começar';
+      dispEl.textContent = fmtSec(cfg.sprint);
+      roundEl.textContent = `— / ${cfg.rounds} tiros`;
+      btnEl.className    = 'tbtn tbtn-main';
+      btnEl.textContent  = '▶ INICIAR';
+      break;
+    case 'sprint':
+      phEl.textContent   = '🔥 CORRA!';
+      phEl.classList.add('ph-sprint');
+      dispEl.textContent = fmtSec(t.remaining);
+      dispEl.classList.add('ph-sprint');
+      roundEl.textContent = `Tiro ${t.round} / ${cfg.rounds}`;
+      btnEl.className    = 'tbtn tbtn-pause-run';
+      btnEl.textContent  = '⏸ PAUSAR';
+      break;
+    case 'rest':
+      phEl.textContent   = '🚶 CAMINHE';
+      phEl.classList.add('ph-rest');
+      dispEl.textContent = fmtSec(t.remaining);
+      dispEl.classList.add('ph-rest');
+      roundEl.textContent = `Tiro ${t.round} concluído · próximo em...`;
+      btnEl.className    = 'tbtn tbtn-pause-walk';
+      btnEl.textContent  = '⏸ PAUSAR';
+      break;
+    case 'paused':
+      phEl.textContent   = '⏸ PAUSADO';
+      dispEl.textContent = fmtSec(t.remaining);
+      roundEl.textContent = `Tiro ${t.round} / ${cfg.rounds} · pausado`;
+      btnEl.className    = 'tbtn tbtn-main';
+      btnEl.textContent  = '▶ CONTINUAR';
+      break;
+    case 'done':
+      phEl.textContent   = '🏆 CONCLUÍDO!';
+      phEl.classList.add('ph-sprint');
+      dispEl.textContent = `${cfg.rounds}/${cfg.rounds}`;
+      dispEl.classList.add('ph-sprint');
+      roundEl.textContent = 'Todos os tiros completos!';
+      btnEl.className    = 'tbtn tbtn-main';
+      btnEl.textContent  = '↺ Recomeçar';
+      break;
+  }
+}
+
+// ============ GYM REST TIMERS ============
+let activeRest = null;
+
+function initRestTimers() {
+  document.querySelectorAll('.block.gym-block').forEach(block => {
+    let seconds = 0;
+    block.querySelectorAll('.tag').forEach(tag => {
+      const txt = tag.textContent.toLowerCase();
+      if (!txt.includes('intervalo')) return;
+      const m = txt.match(/(\d+)\s*(min|seg)/);
+      if (m) seconds = m[2] === 'min' ? parseInt(m[1]) * 60 : parseInt(m[1]);
+    });
+    if (!seconds) return;
+
+    const cd = document.createElement('div');
+    cd.className = 'rest-timer-cd';
+
+    const btn = document.createElement('button');
+    btn.className = 'rest-timer-btn';
+    btn.innerHTML = `⏱ ${fmtSec(seconds)}`;
+    btn.onclick = () => startRest(seconds, btn, cd);
+
+    block.appendChild(cd);
+    block.appendChild(btn);
+  });
+}
+
+function startRest(total, btn, cd) {
+  // Same button: cancel
+  if (activeRest && activeRest.btn === btn) {
+    clearInterval(activeRest.id);
+    cd.classList.remove('active', 'cd-done');
+    btn.innerHTML = `⏱ ${fmtSec(total)}`;
+    btn.disabled = false;
+    activeRest = null;
+    return;
+  }
+  // Cancel previous
+  if (activeRest) {
+    clearInterval(activeRest.id);
+    activeRest.cd.classList.remove('active', 'cd-done');
+    activeRest.btn.innerHTML = `⏱ ${fmtSec(activeRest.total)}`;
+    activeRest.btn.disabled = false;
+  }
+
+  let rem = total;
+  cd.classList.add('active');
+  cd.classList.remove('cd-done');
+  cd.textContent = fmtSec(rem);
+  btn.innerHTML = `⏹ ${fmtSec(rem)}`;
+  btn.disabled = true;
+
+  beep(660, 0.15);
+  vib(80);
+
+  const id = setInterval(() => {
+    rem--;
+    cd.textContent = fmtSec(rem);
+    btn.innerHTML = `⏹ ${fmtSec(rem)}`;
+    if ([3, 2, 1].includes(rem)) beepTick();
+    if (rem <= 0) {
+      clearInterval(id);
+      cd.textContent = '✓ Vai!';
+      cd.classList.add('cd-done');
+      btn.innerHTML = `⏱ ${fmtSec(total)}`;
+      btn.disabled = false;
+      beepEnd();
+      vib([200, 100, 300]);
+      activeRest = null;
+    }
+  }, 1000);
+
+  activeRest = { id, btn, cd, total };
+}
+
+// ============ INIT ============
+loadData();
+renderMonths();
+renderAll();
+if (data.months.length > 0) selectMonth(data.months[data.months.length - 1]);
+
+const days = ['dom','seg','ter','qua','qui','sex','sab'];
+const todayIdx = new Date().getDay();
+const todayBtn = document.querySelectorAll('.day-btn')[todayIdx];
+if (todayBtn) selectDay(days[todayIdx], todayBtn);
+
+initRunTimers();
+initRestTimers();
+
+// ============ SERVICE WORKER ============
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
