@@ -1,8 +1,9 @@
 {
   "name": "Desafio Atleta Híbrido",
   "short_name": "Atleta Híbrido",
-  "description": "Programa de treino híbrido de Eduardo Lima",
-  "start_url": "./treino-hibrido.html",
+  "description": "Treino de hipertrofia + condicionamento de Eduardo Lima — superset de antagonistas, 4x/semana",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0f1a08",
   "theme_color": "#0f1a08",
