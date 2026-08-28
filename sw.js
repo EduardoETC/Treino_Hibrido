@@ -11,7 +11,7 @@
    Ao publicar uma versão nova do app, mude CACHE para v6, v7...
    Sem isso o navegador continua servindo a versão antiga do
    cache e sua atualização não aparece no celular.            */
-const CACHE = 'atleta-hibrido-v5';
+const CACHE = 'atleta-hibrido-v6';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
@@ -29,14 +29,36 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      /* 'fotos-exercicios' é preservado entre versões: são dezenas de MB
+         que não precisam ser rebaixados a cada atualização do app. */
+      .then(ks => Promise.all(ks.filter(k => k !== CACHE && k !== 'fotos-exercicios')
+                                .map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  if (!e.request.url.startsWith(self.location.origin)) return;  // fontes externas passam direto
+  const url = e.request.url;
+  const ehFotoExercicio = url.includes('raw.githubusercontent.com/yuhonas/free-exercise-db');
+
+  /* Fotos de exercício ficam num cache próprio, com estratégia
+     cache-first: uma vez vista, a foto funciona offline. Ficam
+     fora do CACHE principal para que atualizar o app não jogue
+     fora as fotos já baixadas. */
+  if (ehFotoExercicio) {
+    e.respondWith(
+      caches.open('fotos-exercicios').then(c =>
+        c.match(e.request).then(hit => hit || fetch(e.request).then(r => {
+          if (r && r.ok) c.put(e.request, r.clone());
+          return r;
+        }))
+      )
+    );
+    return;
+  }
+
+  if (!url.startsWith(self.location.origin)) return;  // fontes externas passam direto
 
   e.respondWith(
     caches.match(e.request).then(cached => {

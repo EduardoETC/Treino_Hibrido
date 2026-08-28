@@ -9,9 +9,13 @@ próprio aparelho.
 - **Vários planos.** Um por pessoa ou por ciclo, cada um com histórico próprio.
 - **Blocos com tipo.** Série direta, superset, tri-set, circuito e por tempo.
   O tipo controla onde entra o descanso.
-- **Catálogo de 1.324 exercícios** com busca em português, grupo muscular e
-  equipamento. O nome que vai para o plano é o que você digitar.
-- **Ilustração por padrão de movimento** em cada exercício.
+- **Catálogo de 873 exercícios**, todos com **foto real** (posição inicial e
+  final), busca em português, grupo muscular e equipamento. O nome que vai
+  para o plano é o que você digitar.
+- **Foto sob demanda com reserva offline.** As fotos são carregadas do GitHub
+  quando você abre o treino e ficam em cache depois. Sem internet, o app mostra
+  uma ilustração esquemática do padrão de movimento no lugar — o treino e o
+  histórico continuam funcionando.
 - **Registro de carga por mês**, com volume calculado e diferença mês a mês.
 - **Compartilhamento por código de texto.** Um plano de 4 dias vira ~750
   caracteres, colável no WhatsApp.
@@ -45,17 +49,21 @@ por isso o backup existe.
 Depois de trocar o `index.html`, **incremente a versão do cache no `sw.js`**:
 
 ```js
-const CACHE = 'atleta-hibrido-v5';   // → v6, v7, ...
+const CACHE = 'atleta-hibrido-v6';   // → v7, v8, ...
 ```
 
 Sem isso o service worker continua servindo a versão antiga do cache e a
 atualização não aparece em quem já abriu o app.
 
+As **fotos de exercício ficam num cache separado** (`fotos-exercicios`), que
+sobrevive à troca de versão de propósito: são dezenas de MB que não precisam
+ser rebaixados a cada atualização do app.
+
 ## Estrutura
 
 | Arquivo | Papel |
 |---|---|
-| `index.html` | O app inteiro — interface, lógica, catálogo e ilustrações embutidos |
+| `index.html` | O app inteiro — interface, lógica, catálogo e ilustrações de reserva embutidos |
 | `manifest.json` | Metadados do PWA (nome, ícone, cor, tela cheia) |
 | `sw.js` | Service worker — cache e funcionamento offline |
 | `icon.svg` | Ícone do app |
@@ -82,13 +90,19 @@ alguém nunca apaga as cargas que a pessoa já registrou.
 
 ## Créditos e licença
 
-Os dados de exercícios (nomes, grupos musculares, equipamentos) vêm de
-[exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset),
-sob licença MIT, © Hasan Emir Yıldırım.
+Exercícios e fotos vêm de
+[free-exercise-db](https://github.com/yuhonas/free-exercise-db), sob
+**Unlicense** (domínio público) — dados **e** imagens. Os dados derivam de
+[wrkout/exercises.json](https://github.com/wrkout/exercises.json), também em
+domínio público.
 
-**Nenhuma mídia daquele repositório é usada aqui.** As imagens e GIFs de lá
-são © [Gym visual](https://gymvisual.com/) e estão fora da licença MIT.
-As ilustrações deste app foram desenhadas para ele.
+Verificado antes do uso: o `LICENSE` de ambos é a Unlicense íntegra, sem
+seção de exceção de mídia, e não existe `NOTICE`, `ATTRIBUTION` nem
+`MEDIA_LICENSE` no repositório. Domínio público **dispensa atribuição** — o
+crédito acima e na tela de Regras está aí por escolha, não por obrigação.
+
+As ilustrações esquemáticas de reserva (usadas quando não há rede) foram
+desenhadas para este projeto.
 
 O código deste projeto é seu para usar como quiser.
 
