@@ -1,7 +1,8 @@
 /* Cache v3 — o v1 tentava cachear './treino-hibrido.html', que não existe.
    O addAll() falhava inteiro e o modo offline nunca funcionou. */
-const CACHE = 'hibrido-v3';
-const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
+const CACHE = 'hibrido-v4';
+const ASSETS = ['./', './index.html', './manifest.json', './icon.svg',
+                './data/catalog.js', './data/illustrations.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
