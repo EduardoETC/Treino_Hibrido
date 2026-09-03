@@ -11,7 +11,7 @@
    Ao publicar uma versão nova do app, mude CACHE para v6, v7...
    Sem isso o navegador continua servindo a versão antiga do
    cache e sua atualização não aparece no celular.            */
-const CACHE = 'atleta-hibrido-v9';
+const CACHE = 'atleta-hibrido-v10';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {

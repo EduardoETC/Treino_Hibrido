@@ -120,7 +120,6 @@
   .foto-par img{width:100%;border-radius:11px;display:block;background:var(--card2)}
   .foto-par figcaption{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;
     letter-spacing:.8px;margin-top:5px;text-align:center}
-  .foto-credito{font-size:10px;color:var(--muted);line-height:1.5;margin-top:2px}
   .ex-main{flex:1;min-width:0}
   .ex-nome{font-weight:700;font-size:14px;line-height:1.35}
   .ex-pat{font-size:10px;color:var(--muted);margin-top:2px}
@@ -956,6 +955,16 @@ function seedPlanoEduardo() {
              series, reps, tempo: null, carga, nota: nota || '', alerta: !!alerta };
   };
   const bl = (tipo, descanso, ...e) => ({ id: uid(), tipo, descanso, voltas:null, ex: e });
+
+  /* Cardio final é um bloco de verdade, não HTML fixo: aparece no dia,
+     é editável no editor e viaja no código de compartilhamento. Sem foto
+     de propósito — a ilustração do padrão 'cardio' basta. */
+  const cardio = () => bl('tempo', 600,
+    { uid: uid(), nome: 'Bike — cardio final', catId: null, padrao: 'cardio',
+      series: 1, reps: null, tempo: 600, carga: null,
+      nota: '10 a 15 min. Banco alto (joelho quase estendido no ponto mais baixo do pedal), '
+          + 'resistência baixa, cadência 80–90 rpm — esse setup reduz a carga na patela.',
+      alerta: false });
   const id = uid();
   store.plans[id] = {
     id, nome: 'Hipertrofia + Condicionamento', autor: 'Eduardo', criadoEm: Date.now(),
@@ -966,13 +975,15 @@ function seedPlanoEduardo() {
         bl('superset',180, ex('Remada Fechada na Polia','puxar-h',3,12,40),
                            ex('Fly Inclinado','empurrar-h',3,10,5)),
         bl('superset',180, ex('Pulley Fechado','puxar-v',4,10,35),
-                           ex('Peck Deck','empurrar-h',3,12,50))
+                           ex('Peck Deck','empurrar-h',3,12,50)),
+        cardio()
       ]},
       { id:uid(), nome:'DIA 2', foco:'Bíceps + Tríceps', icon:'💪', alerta:'', blocos:[
         bl('superset',180, ex('Tríceps Pulley','triceps',4,10,15),
                            ex('Rosca Direta','rosca',3,10,16)),
         bl('superset',180, ex('Tríceps Corda no Cross','triceps',3,10,12.5,'Confirmar carga real na academia — 12500 no app é provável erro de digitação.'),
-                           ex('Rosca Martelo com Halteres','rosca',3,12,7))
+                           ex('Rosca Martelo com Halteres','rosca',3,12,7)),
+        cardio()
       ]},
       { id:uid(), nome:'DIA 3', foco:'Quadríceps + Posterior', icon:'🦵',
         alerta:'Condromalácia patelar bilateral — respeite as amplitudes indicadas em cada exercício. Dor anterior no joelho = pare, reduza amplitude ou carga.', blocos:[
@@ -982,14 +993,16 @@ function seedPlanoEduardo() {
                            ex('Flexão de Joelhos Em Pé','flexora',3,10,15)),
         bl('superset',180, ex('Cadeira Adutora','aducao',3,12,30),
                            ex('Abdução de Quadril','abducao',3,12,null,'Novo no plano — glúteo médio, melhor evidência para dor patelofemoral. Definir carga na academia.')),
-        bl('direta',120,   ex('Gêmeos Em Pé','panturrilha',4,12,null,'Carga livre — definir na academia.'))
+        bl('direta',120,   ex('Gêmeos Em Pé','panturrilha',4,12,null,'Carga livre — definir na academia.')),
+        cardio()
       ]},
       { id:uid(), nome:'DIA 4', foco:'Ombro + Trapézio', icon:'🏋️', alerta:'', blocos:[
         bl('superset',180, ex('Ombro Articulado','empurrar-v',3,10,15),
                            ex('Encolhimento de Ombros','encolhimento',3,12,null,'Definir carga na academia.')),
         bl('superset',180, ex('Remada Alta na Polia','remada-alta',3,12,null,'Definir carga na academia.'),
                            ex('Elevação Lateral','elev-lateral',3,10,5)),
-        bl('direta',120,   ex('Elevação Frontal com Halteres','elev-frontal',3,12,5))
+        bl('direta',120,   ex('Elevação Frontal com Halteres','elev-frontal',3,12,5)),
+        cardio()
       ]}
     ]
   };
@@ -1072,7 +1085,7 @@ const padLabel = p => window.PATTERN_LABELS[p] || 'Movimento';
 /* Identificação do build. EMBUTIDO é trocado para true pelo script que
    gera o arquivo único; assim a mensagem de erro sabe qual versão está
    rodando e consegue apontar a causa certa em vez de pedir F5 à toa. */
-const BUILD = { EMBUTIDO: true, versao: '2.3', data: '2026-08-28' };
+const BUILD = { EMBUTIDO: true, versao: '2.4', data: '2026-08-28' };
 
 function avisarAssetsFaltando() {
   const falta = [];
@@ -1170,10 +1183,17 @@ function buildDia(d) {
         <div class="nobreak-lbl">SEM DESCANSO ↓</div><div class="nobreak-bar"></div></div>`;
       h += buildExRow(e, b);
     });
+    /* Num bloco por tempo o cronômetro serve para o esforço, não para o
+       descanso: as opções são as durações dos próprios exercícios. */
+    const porTempoBloco = b.tipo === 'tempo';
+    const opts = porTempoBloco
+      ? [...new Set(b.ex.map(e => e.tempo || 600))].sort((a, z) => a - z)
+      : restOpts(b.descanso);
     h += `<div class="bloco-rest">
-      <div class="bloco-rest-lbl">${semDescanso ? 'Descanso depois do bloco completo' : 'Descanso entre séries'}</div>
+      <div class="bloco-rest-lbl">${porTempoBloco ? 'Cronômetro'
+        : semDescanso ? 'Descanso depois do bloco completo' : 'Descanso entre séries'}</div>
       <div class="rest-cd"></div><div class="rest-btns">
-      ${restOpts(b.descanso).map(s => `<button class="rest-btn" data-rest="${s}">⏱ ${fmtSec(s)}</button>`).join('')}
+      ${opts.map(s => `<button class="rest-btn" data-rest="${s}">⏱ ${fmtSec(s)}</button>`).join('')}
       </div></div></div>`;
   });
 
@@ -1739,8 +1759,6 @@ function verFotos(catId, nome) {
       ${esc(c.n)} · ${esc(c.q || 'sem equipamento')} · ${esc(c.m || '')}
       ${c.s && c.s.length ? '<br>Secundários: ' + esc(c.s.join(', ')) : ''}
     </div>
-    <div class="foto-credito">Fotos: free-exercise-db (domínio público)${
-      fotoEmbutida(c.i) ? ' · embutidas no app, funcionam offline' : ' · carregadas do GitHub'}</div>
     <div class="sheet-btns"><button class="btn btn-primary" onclick="fecharSheet()">Fechar</button></div>`);
 }
 

@@ -10,13 +10,12 @@ próprio aparelho.
 - **Blocos com tipo.** Série direta, superset, tri-set, circuito e por tempo.
   O tipo controla onde entra o descanso.
 - **Catálogo de 873 exercícios**, todos com **foto real** (posição inicial e
-  final), busca em português, grupo muscular e equipamento. O nome que vai
-  para o plano é o que você digitar.
-- **Fotos do plano embutidas.** Os exercícios do plano inicial trazem as fotos
-  dentro do próprio `index.html` (base64, 420px, ~18 KB cada) e funcionam
-  offline e atrás de rede filtrada — a situação de academia. Os demais
-  carregam do GitHub na primeira visualização e ficam em cache. Se falharem,
-  entra uma ilustração esquemática do padrão de movimento.
+  final), busca em português, grupo muscular e equipamento.
+- **Fotos do plano embutidas** no próprio `index.html` (base64, 420px) — funcionam
+  offline e atrás de rede filtrada. Os demais exercícios carregam do GitHub na
+  primeira visualização e ficam em cache; se falharem, entra uma ilustração
+  esquemática do padrão de movimento.
+- **Cardio final** como bloco por tempo, com cronômetro de 10 min.
 - **Registro de carga por mês**, com volume calculado e diferença mês a mês.
 - **Compartilhamento por código de texto.** Um plano de 4 dias vira ~750
   caracteres, colável no WhatsApp.
@@ -50,7 +49,7 @@ por isso o backup existe.
 Depois de trocar o `index.html`, **incremente a versão do cache no `sw.js`**:
 
 ```js
-const CACHE = 'atleta-hibrido-v9';   // → v10, v11, ...
+const CACHE = 'atleta-hibrido-v10';   // → v11, v12, ...
 ```
 
 Sem isso o service worker continua servindo a versão antiga do cache e a
@@ -95,8 +94,8 @@ domínio público.
 
 Verificado antes do uso: o `LICENSE` de ambos é a Unlicense íntegra, sem seção
 de exceção de mídia, e não existe `NOTICE`, `ATTRIBUTION` nem `MEDIA_LICENSE`.
-Domínio público **dispensa atribuição** — o crédito aqui e na tela de Regras
-está por escolha, não por obrigação.
+Domínio público dispensa atribuição — o crédito aqui e na tela de Regras está
+por escolha, não por obrigação.
 
 As ilustrações esquemáticas de reserva foram desenhadas para este projeto.
 
