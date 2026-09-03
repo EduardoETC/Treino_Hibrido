@@ -9,9 +9,14 @@ próprio aparelho.
 - **Vários planos.** Um por pessoa ou por ciclo, cada um com histórico próprio.
 - **Blocos com tipo.** Série direta, superset, tri-set, circuito e por tempo.
   O tipo controla onde entra o descanso.
-- **Catálogo de 1.324 exercícios** com busca em português, grupo muscular e
-  equipamento. O nome que vai para o plano é o que você digitar.
-- **Ilustração por padrão de movimento** em cada exercício.
+- **Catálogo de 873 exercícios**, todos com **foto real** (posição inicial e
+  final), busca em português, grupo muscular e equipamento. O nome que vai
+  para o plano é o que você digitar.
+- **Fotos do plano embutidas.** Os exercícios do plano inicial trazem as fotos
+  dentro do próprio `index.html` (base64, 420px, ~18 KB cada) e funcionam
+  offline e atrás de rede filtrada — a situação de academia. Os demais
+  carregam do GitHub na primeira visualização e ficam em cache. Se falharem,
+  entra uma ilustração esquemática do padrão de movimento.
 - **Registro de carga por mês**, com volume calculado e diferença mês a mês.
 - **Compartilhamento por código de texto.** Um plano de 4 dias vira ~750
   caracteres, colável no WhatsApp.
@@ -45,16 +50,11 @@ por isso o backup existe.
 Depois de trocar o `index.html`, **incremente a versão do cache no `sw.js`**:
 
 ```js
-const CACHE = 'atleta-hibrido-v8';   // → v9, v10, ...
+const CACHE = 'atleta-hibrido-v9';   // → v10, v11, ...
 ```
 
 Sem isso o service worker continua servindo a versão antiga do cache e a
 atualização não aparece em quem já abriu o app.
-
-Se acontecer mesmo assim, o app tem saída própria: **Regras → Sobre esta versão
-→ Forçar atualização**. O painel também mostra qual build está rodando, quantas
-fotos estão embutidas e quais caches existem — útil para descobrir se o
-problema é cache ou arquivo errado. Planos e histórico não são afetados.
 
 ## Estrutura
 
@@ -87,13 +87,18 @@ alguém nunca apaga as cargas que a pessoa já registrou.
 
 ## Créditos e licença
 
-Os dados de exercícios (nomes, grupos musculares, equipamentos) vêm de
-[exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset),
-sob licença MIT, © Hasan Emir Yıldırım.
+Exercícios e fotos vêm de
+[free-exercise-db](https://github.com/yuhonas/free-exercise-db), sob
+**Unlicense** (domínio público) — dados **e** imagens. Os dados derivam de
+[wrkout/exercises.json](https://github.com/wrkout/exercises.json), também
+domínio público.
 
-**Nenhuma mídia daquele repositório é usada aqui.** As imagens e GIFs de lá
-são © [Gym visual](https://gymvisual.com/) e estão fora da licença MIT.
-As ilustrações deste app foram desenhadas para ele.
+Verificado antes do uso: o `LICENSE` de ambos é a Unlicense íntegra, sem seção
+de exceção de mídia, e não existe `NOTICE`, `ATTRIBUTION` nem `MEDIA_LICENSE`.
+Domínio público **dispensa atribuição** — o crédito aqui e na tela de Regras
+está por escolha, não por obrigação.
+
+As ilustrações esquemáticas de reserva foram desenhadas para este projeto.
 
 O código deste projeto é seu para usar como quiser.
 
