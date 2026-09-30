@@ -16,6 +16,9 @@ próprio aparelho.
   primeira visualização e ficam em cache; se falharem, entra uma ilustração
   esquemática do padrão de movimento.
 - **Cardio final** como bloco por tempo, com cronômetro de 10 min.
+- **Entrevista de onboarding** que monta um full body a partir de 7 perguntas
+  (dias, tempo, equipamento, nível, objetivo, restrições) e uma triagem de saúde.
+  O plano sai como plano comum: editável, compartilhável, com histórico próprio.
 - **Registro de carga por mês**, com volume calculado e diferença mês a mês.
 - **Compartilhamento por código de texto.** Um plano de 4 dias vira ~750
   caracteres, colável no WhatsApp.
